@@ -14,11 +14,16 @@ I will use python to create a local GUI software suitable for the client's situa
 2. The application, when in reserve mode, can make reservations with the name, number of people and start time. The user can see their own reservation, and it can be cancelled.
 3. The application, when in hotel manager mode, can input the dinner resevations of the stayers of the hotel. The user can see the reservations that they have registered.
 4. The application, when in hotel restaurant manager mode, can see the reservations made to the restaurant both from the hotel and directly.
-5. The application will automatically assign seats, and the manager will be able to see which seats are empty for the next two hours.
+5. The application will automatically assign seats, and the manager will be able to see which seats are empty for the next two hours, with a function to change the time.
+
+#### Client Approval of Success Criteria
+![image](https://github.com/user-attachments/assets/164416b1-9e3e-4488-8cec-c81ade5ffc39)
+![image](https://github.com/user-attachments/assets/46c7ab2e-e2ef-446d-8d63-a2ba2fc279ba)
+
 
 ## Criteria B: Design
 ## Record of Tasks
 |**Planned Action**|**Planned Outcome**|**Time Estimate**|**Completion Date**|**Criteria**|
 |---|---|---|---|---|
 |Meet with client and clarify problem|Problem definition written|40 min|Jan 30th|A|
-|Create a proposed solution|Solution proposal written|30 min|A|
+|Create a proposed solution|Solution proposal written|30 min|Jan 31st|A|
