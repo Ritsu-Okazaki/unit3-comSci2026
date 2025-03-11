@@ -22,7 +22,16 @@ I will use python to create a local GUI software suitable for the client's situa
 
 
 ## Criteria B: Design
-## Record of Tasks
+### Application Wireframe
+![image](https://github.com/user-attachments/assets/f12d4ca2-0501-4be1-be95-4ec06c8c4579)
+
+### UML Diagram
+![image](https://github.com/user-attachments/assets/28ca0cd9-72d2-49c2-9912-c26f1ef7fe32)
+
+### ER Diagram
+
+
+### Record of Tasks
 |**Planned Action**|**Planned Outcome**|**Time Estimate**|**Completion Date**|**Criteria**|
 |---|---|---|---|---|
 |Meet with client and clarify problem|Problem definition written|40 min|Jan 30th|A|
