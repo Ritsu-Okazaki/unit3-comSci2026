@@ -29,6 +29,8 @@ I will use python to create a local GUI software suitable for the client's situa
 ![image](https://github.com/user-attachments/assets/28ca0cd9-72d2-49c2-9912-c26f1ef7fe32)
 
 ### ER Diagram
+![image](https://github.com/user-attachments/assets/dba1bfae-726f-4768-b5da-13a0fcb607c5)
+
 
 
 ### Record of Tasks
