@@ -11,7 +11,7 @@ I will use python to create a local GUI software suitable for the client's situa
 
 ### Success Criteria
 1. The application has a login function that authenticates and differentiates the hotel restaurant owner, the hotel owner and the reserving visitor.
-2. The application, when in reserve mode, can make reservations with the name, number of people and start time. The user can see their own reservation, and it can be cancelled.
+2. The application, when in reserve mode, can make reservations with the name, number of people and start time. The user can see their own reservation.
 3. The application, when in hotel manager mode, can input the dinner resevations of the stayers of the hotel. The user can see the reservations that they have registered.
 4. The application, when in hotel restaurant manager mode, can see the reservations made to the restaurant both from the hotel and directly.
 5. The application will automatically assign seats, and the manager will be able to see which seats are empty for the next two hours, with a function to change the time.
@@ -31,7 +31,57 @@ I will use python to create a local GUI software suitable for the client's situa
 ### ER Diagram
 ![image](https://github.com/user-attachments/assets/dba1bfae-726f-4768-b5da-13a0fcb607c5)
 
+### Flow diagram
+![image](https://github.com/user-attachments/assets/0eaa2ad8-7930-4137-bcc6-9bfa2abd55b8)
+_Flow diagram of get_slider_value from class MainScreen, CustomerScreen and HotelMainScreen_
 
+## Criteria C: Development
+
+### 1. Database manager
+In order to work with a SQLite database, there are set steps that needs to be completed for each process in the creation of relational database, insertion of values and extraction of values. First, in the establishment of connection with the database, sqlite3 provides a module function ```sqlite3.connect``` that creates a ```Connection``` object which represent the connection to the database by providing a path to the database. Once the connection is established, to execute queries and fetch results from specific rows of the relational database, a cursor needs to be created, which is possible by using the ```cursor``` method which creates a ```cursor``` object. To a ```cursor``` object, using the ```cursor.execute``` method will execute the provided SQL statements. To make changes to the database, the transaction has to be commited by using the ```connection.commit``` method. To read results, the results of ```execute``` can be assiged to a variable, which can be converted into a list by using the ```.fetchall()``` method that will return the list of each row in the database that matches the conditions which the SQL statements specified.
+```.py
+import sqlite3
+con = sqlite3.connect("tutorial.db") # create connection
+cur = con.cursor() # create cursor
+cur.execute("CREATE TABLE table (id PRIMARY KEY INTEGER UNIQUE, value TEXT)") # execute SQL statement
+con.commit() # confirm transaction
+
+res = cur.execute("SELECT * FROM table") # reading SQL queries
+lis = res.fetchall() # convert each row to a list
+```
+However, it is repetitive and inconvenient that this sequence needs to happen every time we manipulate or read from the database. So, I created a class called ```DatabaseManager``` which turns the database connection into an object which can be used to call methods in simpler, shorter lines of code that does not repeatedly declare the connection or the cursor.
+```
+import sqlite3
+
+class DatabaseManager:
+    def __init__(self, name: str):
+        self.connection = sqlite3.connect(name)
+        self.cursor = self.connection.cursor()
+
+    def search(self, query):
+        result = self.cursor.execute(query).fetchall()
+        return result
+
+    def close(self):
+        self.connection.close()
+
+    def run_save(self, query):
+        self.cursor.execute(query)
+        self.connection.commit()
+```.py
+
+
+### 2. Meeting Success Criteria 4: Seeing reservations both by the hotel and directly
+To meet Success Criteria 4: "The application, when in hotel restaurant manager mode, can see the reservations made to the restaurant both from the hotel and directly.", I created a table called ```joint_table``` in ```database.db```, that stores the information of the reservations.
+```.py
+db = DatabaseManager('database.db')
+db.run_save(query="""CREATE TABLE IF NOT EXISTS joint_table (id INTEGER PRIMARY KEY UNIQUE, stayer INTEGER, rep_name TEXT, number INTEGER, start_time INTEGER, assigned_seat INTEGER)""")
+```
+
+
+### 2. Meeting Success Criteria 2: Making a reservation
+To meet Success Criteria 2: "The application, when in reserve mode, can make reservations with the name, number of people and start time. The user can see their own reservation.", 
+   
 
 ### Record of Tasks
 |**Planned Action**|**Planned Outcome**|**Time Estimate**|**Completion Date**|**Criteria**|
