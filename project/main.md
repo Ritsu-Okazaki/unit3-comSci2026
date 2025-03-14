@@ -56,12 +56,15 @@ item.bind(on_press=lambda instance=item, time=slider_value: self.on_touch(instan
 ```
 In the last line, the program binds the created ```ThreeLineListItem``` with an event ```self.on_touch```, using the function ```bind``` from ```EventDispatcher``` that binds an event to a callback. Here, the program uses a lambda expression to declare the ```self.on_touch``` function as a callback attribute to the ```on_press``` event, instead of declaring directly like ```item.bind(on_press = self.on_touch(item, slider_value)``` which is how I did it initially and encountered an error. I figured out that the reason why a lambda expression needed to be used is that ```bind``` asks for a function reference, instead of a function call. When attributes are given to the function like in ```item.bind(on_press = self.on_touch(item, slider_value)```, it is a function call which means that the function is executed, and ```on_press = self.on_touch(item, slider_value)``` declaration will assign the return value of the ```on_touch``` function to the ```on_press``` event, which is unintended. On top of that, because this bind declaration is made in prior to the press by the user and in the initialization process, the function call will execute the function immidiately as the code starts instead of when the user presses the item. To correctly bind a corresponding execution to the event, a function reference is required, while declaring the attributes for the function. A solution for this is to refer to a buffer function without attributes that call the intended function, like below.
 ```.py
-item.bind(on_press=on_touch_buffer)
+item.bind(on_press=on_touch_wrapper)
 
-def on_touch_buffer():
-    on_touch
+def on_touch_wrapper(item, slider_value):
+    def wrapper(instance):
+        self.on_touch(item, slider_value)
 
-
+    return wrapper
+```
+Here, ```on_touch_wrapper``` is a function that returns a reference to ```wrapper``` which includes a call for the function ```on_touch```. This way, the ```on_touch``` gets executed only if the event is triggered.
 
 
 ### Record of Tasks
