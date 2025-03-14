@@ -37,51 +37,32 @@ _Flow diagram of get_slider_value from class MainScreen, CustomerScreen and Hote
 
 ## Criteria C: Development
 
-### 1. Database manager
-In order to work with a SQLite database, there are set steps that needs to be completed for each process in the creation of relational database, insertion of values and extraction of values. First, in the establishment of connection with the database, sqlite3 provides a module function ```sqlite3.connect``` that creates a ```Connection``` object which represent the connection to the database by providing a path to the database. Once the connection is established, to execute queries and fetch results from specific rows of the relational database, a cursor needs to be created, which is possible by using the ```cursor``` method which creates a ```cursor``` object. To a ```cursor``` object, using the ```cursor.execute``` method will execute the provided SQL statements. To make changes to the database, the transaction has to be commited by using the ```connection.commit``` method. To read results, the results of ```execute``` can be assiged to a variable, which can be converted into a list by using the ```.fetchall()``` method that will return the list of each row in the database that matches the conditions which the SQL statements specified.
+### 1. Show Dialog + Lambda Expression
+To meet Success Criteria 2&3: allowing the user to add reservation data to the database, I decided to create a GUI where a user can click on a empty seat on the MDList that shows the occupancy of the seats in the restaurant to add a reservation. The dialog is a temporary entity in the GUI that is not always present on a screen, so it needed to be binded to an event in the app that will create an instance whenever the user triggers the event. The Kivy framework provides an ```EventDispatcher``` class that provides functions that manages the registeration or manipulation of events for objects that produce events. For my application, ```ThreeLineItem``` is the object that triggers the event, because they are the contents of the ```MDList``` that show the detail of each reservation, along with showing which seats remain empty. ```ThreeLineItem``` has three attributes, ```text```, ```secondary_text``` and ```tertiary_text```. I used the first text to show the seat number and its occupancy state, the second text to show the number of seats and their occupancy state, and the third text to show the time which the reservation begins. Initially, I was directly declaring the ```ThreeLineItem``` individually in different parts of the code. However, because there are set multiple configurations for the attributes depending on the occupancy state of the seat, I created a function named ```make_seat_item``` that returns a ```ThreeLineListItem``` with its attributes declared by input values that are formatted using the lists stored in the dictionary ```status_list```, shown below.
 ```.py
-import sqlite3
-con = sqlite3.connect("tutorial.db") # create connection
-cur = con.cursor() # create cursor
-cur.execute("CREATE TABLE table (id PRIMARY KEY INTEGER UNIQUE, value TEXT)") # execute SQL statement
-con.commit() # confirm transaction
+def make_seat_item(status:str, seat_number:int, start_time:int, rep_name:str=None, reserver_number:int=None):
+    status_list = {"unassigned": [f'Seat {seat_number}: Unassigned', f'4 available', f'{start_time}:00~{start_time + 2}:00'],
+                   "unavailable": [f'Seat {seat_number}: Reserved for next slot', f'Unavailable', f'{start_time}:00~{start_time + 2}:00'],
+                   "assigned": [f'Seat {seat_number}: {rep_name}', f'{reserver_number} people', f'{start_time}:00~{start_time + 2}:00'],
+                   "reserved": [f'Seat {seat_number}: Reserved', f'{reserver_number} people', f'{start_time}:00~{start_time + 2}:00']}
+    item = ThreeLineListItem(text=status_list[status][0],
+                             secondary_text=status_list[status][1],
+                             tertiary_text=status_list[status][2])
+    return item
 
-res = cur.execute("SELECT * FROM table") # reading SQL queries
-lis = res.fetchall() # convert each row to a list
+
+item = make_seat_item("unassigned", number_of_people, slider_value)
+item.bind(on_press=lambda instance=item, time=slider_value: self.on_touch(instance, time))
 ```
-However, it is repetitive and inconvenient that this sequence needs to happen every time we manipulate or read from the database. So, I created a class called ```DatabaseManager``` which turns the database connection into an object which can be used to call methods in simpler, shorter lines of code that does not repeatedly declare the connection or the cursor.
-```
-import sqlite3
-
-class DatabaseManager:
-    def __init__(self, name: str):
-        self.connection = sqlite3.connect(name)
-        self.cursor = self.connection.cursor()
-
-    def search(self, query):
-        result = self.cursor.execute(query).fetchall()
-        return result
-
-    def close(self):
-        self.connection.close()
-
-    def run_save(self, query):
-        self.cursor.execute(query)
-        self.connection.commit()
+In the last line, the program binds the created ```ThreeLineListItem``` with an event ```self.on_touch```, using the function ```bind``` from ```EventDispatcher``` that binds an event to a callback. Here, the program uses a lambda expression to declare the ```self.on_touch``` function as a callback attribute to the ```on_press``` event, instead of declaring directly like ```item.bind(on_press = self.on_touch(item, slider_value)``` which is how I did it initially and encountered an error. I figured out that the reason why a lambda expression needed to be used is that ```bind``` asks for a function reference, instead of a function call. When attributes are given to the function like in ```item.bind(on_press = self.on_touch(item, slider_value)```, it is a function call which means that the function is executed, and ```on_press = self.on_touch(item, slider_value)``` declaration will assign the return value of the ```on_touch``` function to the ```on_press``` event, which is unintended. On top of that, because this bind declaration is made in prior to the press by the user and in the initialization process, the function call will execute the function immidiately as the code starts instead of when the user presses the item. To correctly bind a corresponding execution to the event, a function reference is required, while declaring the attributes for the function. A solution for this is to refer to a buffer function without attributes that call the intended function, like below.
 ```.py
+item.bind(on_press=on_touch_buffer)
+
+def on_touch_buffer():
+    on_touch
 
 
-### 2. Meeting Success Criteria 4: Seeing reservations both by the hotel and directly
-To meet Success Criteria 4: "The application, when in hotel restaurant manager mode, can see the reservations made to the restaurant both from the hotel and directly.", I created a table called ```joint_table``` in ```database.db```, that stores the information of the reservations.
-```.py
-db = DatabaseManager('database.db')
-db.run_save(query="""CREATE TABLE IF NOT EXISTS joint_table (id INTEGER PRIMARY KEY UNIQUE, stayer INTEGER, rep_name TEXT, number INTEGER, start_time INTEGER, assigned_seat INTEGER)""")
-```
 
-
-### 2. Meeting Success Criteria 2: Making a reservation
-To meet Success Criteria 2: "The application, when in reserve mode, can make reservations with the name, number of people and start time. The user can see their own reservation.", 
-   
 
 ### Record of Tasks
 |**Planned Action**|**Planned Outcome**|**Time Estimate**|**Completion Date**|**Criteria**|
